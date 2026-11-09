@@ -146,10 +146,21 @@ test('page.setContent() cannot load file:// resources', async () => {
   }
 });
 
-test('flex and grid items share one line', async () => {
+test('flex and grid items share one line; margin boxes print', async () => {
   const pdf = await renderPdf(browser, 'test/fixtures/modern-css.html');
   assert.equal(wordBox(pdf, 'FLEXA').yMin, wordBox(pdf, 'FLEXC').yMin);
   assert.equal(wordBox(pdf, 'GRIDA').yMin, wordBox(pdf, 'GRIDC').yMin);
+  assert.match(text(pdf), /MARGINBOXTEXT/);
+});
+
+test('Chrome prints no margin box when the page margin is 0', async () => {
+  const page = await browser.newPage();
+  try {
+    await page.setContent('<style>@page { margin: 0; @bottom-center { content: "MARGINBOXTEXT"; } }</style><p>Body</p>');
+    assert.doesNotMatch(text(await page.pdf(PDF_OPTIONS)), /MARGINBOXTEXT/);
+  } finally {
+    await page.close();
+  }
 });
 
 test('--outline: outline true adds PDF bookmarks', async () => {

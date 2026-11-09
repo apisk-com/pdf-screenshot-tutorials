@@ -151,8 +151,11 @@ def test_folder_fetcher_allows_files_in_the_folder_only():
         fetcher.fetch('file:///etc/hostname')
     with pytest.raises(ValueError, match='disallowed protocol'):
         fetcher.fetch('http://169.254.169.254/latest/meta-data/')
-    # The font of this fixture is outside its folder, so WeasyPrint uses a fallback font.
+    # The WOFF2 font of this fixture is outside its folder: blocked, so a fallback font is used.
     assert 'Inter' not in fonts(render_fixture('outside-font.html'))
+    # With the repo folder allowed, the same WOFF2 font loads.
+    html = HTML(filename=FIXTURES / 'outside-font.html', url_fetcher=FolderFetcher(ROOT))
+    assert 'Inter' in fonts(html.write_pdf())
 
 
 def test_headings_become_bookmarks():
@@ -160,7 +163,8 @@ def test_headings_become_bookmarks():
     assert outline[0].title == 'Heading one'
 
 
-def test_flex_and_grid_items_share_one_line():
+def test_flex_and_grid_items_share_one_line_and_margin_boxes_print():
     pdf = render_fixture('modern-css.html')
     assert word_box(pdf, 'FLEXA')['y_min'] == word_box(pdf, 'FLEXC')['y_min']
     assert word_box(pdf, 'GRIDA')['y_min'] == word_box(pdf, 'GRIDC')['y_min']
+    assert 'MARGINBOXTEXT' in text(pdf)

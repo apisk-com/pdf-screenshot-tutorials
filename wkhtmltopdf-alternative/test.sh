@@ -64,6 +64,7 @@ expect "--disable-smart-shrinking: a 400px box in pt" "$(ruler out/wk-noshrink.p
 wkhtmltopdf -q test/fixtures/modern-css.html out/wk-modern.pdf
 expect "flex items on one line" "$([ "$(word out/wk-modern.pdf FLEXA yMin)" = "$(word out/wk-modern.pdf FLEXC yMin)" ] && echo yes || echo no)" no
 expect "grid items on one line" "$([ "$(word out/wk-modern.pdf GRIDA yMin)" = "$(word out/wk-modern.pdf GRIDC yMin)" ] && echo yes || echo no)" no
+expect "@page margin box text printed" "$(pdftotext out/wk-modern.pdf - | grep -c MARGINBOXTEXT || true)" 0
 
 wkhtmltopdf -q -L 10mm test/fixtures/css-margin.html out/wk-css-margin.pdf
 expect "CSS @page margin 30mm and -L 10mm: left edge under 40 pt" "$(echo "$(word out/wk-css-margin.pdf TOPLEFT xMin) < 40" | bc)" 1
