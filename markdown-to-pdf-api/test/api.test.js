@@ -7,6 +7,8 @@ import { createApp } from '../src/app.js';
 import { cleanMarkdown, markdownToHtml } from '../src/markdown.js';
 import { closeBrowser, renderPdf } from '../src/render.js';
 
+const FENCE = '`'.repeat(3); // a Markdown code fence
+
 let api;
 let baseUrl;
 
@@ -61,7 +63,7 @@ test('raw HTML and javascript: links are printed as text', () => {
 });
 
 test('code fences get highlight.js classes', () => {
-  assert.match(markdownToHtml('```js\nconst a = 1;\n```'), /hljs-keyword/);
+  assert.match(markdownToHtml(`${FENCE}js\nconst a = 1;\n${FENCE}`), /hljs-keyword/);
 });
 
 test('<br> breaks a line in a table cell, nowhere else', () => {
@@ -70,10 +72,11 @@ test('<br> breaks a line in a table cell, nowhere else', () => {
   assert.match(html, /Text &lt;br&gt; here/);
 });
 
-test('front matter and an outer ```markdown fence are removed', () => {
+test('front matter and an outer markdown fence are removed', () => {
   assert.equal(cleanMarkdown('---\ntitle: Notes\n---\n# Hi'), '# Hi');
-  assert.equal(cleanMarkdown('```markdown\n# Hi\n\nText\n```'), '# Hi\n\nText');
-  assert.equal(cleanMarkdown('```js\nx = 1\n```'), '```js\nx = 1\n```');
+  assert.equal(cleanMarkdown(`${FENCE}markdown\n# Hi\n\nText\n${FENCE}`), '# Hi\n\nText');
+  const code = `${FENCE}js\nx = 1\n${FENCE}`;
+  assert.equal(cleanMarkdown(code), code);
 });
 
 test('the render makes no network requests', async () => {

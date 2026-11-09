@@ -56,8 +56,8 @@ export function cleanMarkdown(text) {
   // Front matter (--- at the top) is metadata, not text. Remove it without
   // parsing it: some front matter parsers can run JavaScript.
   clean = clean.replace(/^---[a-z]*\n[\s\S]*?\n---(\n|$)/, '');
-  // Chat models often put the full answer in a ```markdown fence. Remove that
-  // outer fence, so the answer prints as a document, not as one code block.
+  // Chat models often put the full answer in a code fence marked markdown.
+  // Remove that outer fence, so the answer prints as a document, not as code.
   const fenced = clean.match(/^(`{3,}|~{3,})(?:markdown|md)[ \t]*\n([\s\S]*?)\n\1[ \t]*$/i);
   return fenced ? fenced[2] : clean;
 }
