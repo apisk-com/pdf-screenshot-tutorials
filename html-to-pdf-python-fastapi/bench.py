@@ -24,13 +24,19 @@ def measure(html, runs):
     return result, statistics.median(renders), statistics.median(totals), max(memory)
 
 
-runs = int(sys.argv[1]) if len(sys.argv) > 1 else 20
-data = json.loads((Path(__file__).parent / "examples" / "invoice.json").read_text())
-render_pdf("<p>Start</p>")  # start the fork server
+def main():
+    runs = int(sys.argv[1]) if len(sys.argv) > 1 else 20
+    data = json.loads((Path(__file__).parent / "examples" / "invoice.json").read_text())
+    documents = [("Empty page", "<p>Hi</p>"), ("Invoice", invoice_html(Invoice.model_validate(data)))]
+    render_pdf("<p>Start</p>")  # start the fork server
+    for name, html in documents:
+        result, render_s, total_s, peak_mb = measure(html, runs)
+        print(f"{name}: {result.pages} pages, {len(result.pdf):,} bytes, median of {runs} runs")
+        print(f"  render in the child process: {render_s * 1000:.0f} ms")
+        print(f"  render_pdf() call, with process start: {total_s * 1000:.0f} ms")
+        print(f"  peak memory of the child process: {peak_mb:.0f} MB")
 
-for name, html in [("Empty page", "<p>Hi</p>"), ("Invoice", invoice_html(Invoice.model_validate(data)))]:
-    result, render_s, total_s, peak_mb = measure(html, runs)
-    print(f"{name}: {result.pages} pages, {len(result.pdf):,} bytes, median of {runs} runs")
-    print(f"  render in the child process: {render_s * 1000:.0f} ms")
-    print(f"  render_pdf() call, with process start: {total_s * 1000:.0f} ms")
-    print(f"  peak memory of the child process: {peak_mb:.0f} MB")
+
+# Each render process imports the main module. Without this check, it runs main() again.
+if __name__ == "__main__":
+    main()
