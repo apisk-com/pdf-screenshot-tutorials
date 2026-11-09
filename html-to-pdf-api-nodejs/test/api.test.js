@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
+import { spawn } from 'node:child_process';
+import { once } from 'node:events';
 import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { after, before, test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { PDFDocument } from 'pdf-lib';
 
 // A short timeout, so that the timeout test runs fast. Set it before the import.
@@ -14,15 +17,22 @@ let api;
 let pages;
 let baseUrl;
 let pagesUrl;
+let onDelayRequest = () => {};
 
 before(async () => {
   api = createApp().listen(0);
   baseUrl = `http://127.0.0.1:${api.address().port}`;
 
   // A local web page for the URL tests. "/slow" never answers.
+  // "/delay" answers after 500 ms.
   pages = createServer((req, res) => {
     if (req.url === '/slow') return;
     res.setHeader('Content-Type', 'text/html');
+    if (req.url === '/delay') {
+      onDelayRequest();
+      setTimeout(() => res.end('<h1>Late page</h1>'), 500);
+      return;
+    }
     res.end('<h1>Served page</h1>');
   }).listen(0);
   pagesUrl = `http://127.0.0.1:${pages.address().port}`;
@@ -85,6 +95,30 @@ test('the template escapes HTML in the data', async () => {
 test('renders a URL', async () => {
   const pdf = await readPdf(await postPdf({ url: `${pagesUrl}/` }));
   assert.equal(pdf.getPageCount(), 1);
+});
+
+test('finishes an open request on SIGTERM, then exits', async () => {
+  const server = spawn(process.execPath, [fileURLToPath(new URL('../src/server.js', import.meta.url))], {
+    env: { ...process.env, PORT: '0' },
+    stdio: ['ignore', 'pipe', 'inherit'],
+  });
+  const [line] = await once(server.stdout, 'data');
+  const url = String(line).match(/http:\/\/\S+/)[0];
+
+  const renderStarted = new Promise((resolve) => {
+    onDelayRequest = resolve;
+  });
+  const response = fetch(`${url}/pdf`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url: `${pagesUrl}/delay` }),
+  });
+  await renderStarted;
+  server.kill('SIGTERM');
+
+  await readPdf(await response);
+  const [code] = await once(server, 'exit');
+  assert.equal(code, 0);
 });
 
 test('returns 504 when the page does not load in time', async () => {

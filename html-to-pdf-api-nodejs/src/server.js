@@ -8,7 +8,7 @@ await getBrowser();
 
 const server = createApp().listen(port, (error) => {
   if (error) throw error;
-  console.log(`HTML to PDF API on http://localhost:${port}`);
+  console.log(`HTML to PDF API on http://localhost:${server.address().port}`);
 });
 
 // Docker and most process managers send SIGTERM before they stop the service.

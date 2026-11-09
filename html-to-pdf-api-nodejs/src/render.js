@@ -15,7 +15,11 @@ export function getBrowser() {
 
 async function launchBrowser() {
   try {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      // server.js handles these signals: open requests finish, then Chrome closes.
+      handleSIGINT: false,
+      handleSIGTERM: false,
+    });
     // If Chrome crashes, the next request starts a new one.
     browser.on('disconnected', () => {
       browserPromise = undefined;
