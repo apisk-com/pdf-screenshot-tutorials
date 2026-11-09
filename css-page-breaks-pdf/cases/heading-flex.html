@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Heading before a flex container</title>
+  <style>
+    /* The same base in every test document: A5 pages and 20px lines,
+       so that each engine puts the page break at the same place. */
+    @page { size: A5; margin: 15mm; }
+    html { font: 14px/20px "Liberation Sans", Arial, sans-serif; color: #1f2933; }
+    body { margin: 0; }
+    h2 { font-size: 18px; line-height: 24px; margin: 0 0 8px; }
+    p { margin: 0 0 10px; }
+    .spacer { background: #e4e7eb; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 4px 6px; border: 1px solid #9aa5b1; text-align: left; vertical-align: top; }
+    .columns { display: flex; gap: 12px; }
+  </style>
+</head>
+<body>
+  <!-- The heading fits at the end of page 1, the flex row does not. -->
+  <div class="spacer" style="height: 640px"></div>
+  <h2>HEADING Results</h2>
+  <div class="columns">
+    <p>PARA1 left column<br>second line</p>
+    <p>right column<br>second line</p>
+  </div>
+</body>
+</html>

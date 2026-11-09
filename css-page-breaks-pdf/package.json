@@ -1,0 +1,15 @@
+{
+  "name": "css-page-breaks-pdf",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Test documents for CSS page breaks in Chrome (Puppeteer, Playwright) and WeasyPrint",
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "playwright": "1.65.0",
+    "puppeteer": "25.16.0"
+  }
+}

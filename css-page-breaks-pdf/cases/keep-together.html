@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>A block that must not break</title>
+  <style>
+    /* The same base in every test document: A5 pages and 20px lines,
+       so that each engine puts the page break at the same place. */
+    @page { size: A5; margin: 15mm; }
+    html { font: 14px/20px "Liberation Sans", Arial, sans-serif; color: #1f2933; }
+    body { margin: 0; }
+    h2 { font-size: 18px; line-height: 24px; margin: 0 0 8px; }
+    p { margin: 0 0 10px; }
+    .spacer { background: #e4e7eb; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 4px 6px; border: 1px solid #9aa5b1; text-align: left; vertical-align: top; }
+    .card { border: 1px solid #9aa5b1; padding: 4px 8px; }
+  </style>
+</head>
+<body>
+  <!-- The card starts near the end of page 1 and has 7 lines. -->
+  <div class="spacer" style="height: 560px"></div>
+  <div class="card">CARD1 first line<br>text<br>text<br>text<br>text<br>text<br>CARDEND last line</div>
+</body>
+</html>

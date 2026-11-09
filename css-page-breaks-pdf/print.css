@@ -1,0 +1,39 @@
+/* Page break rules for HTML to PDF. Tested with Chrome 156 (Puppeteer),
+   Chromium 158 (Playwright) and WeasyPrint 70. */
+
+/* Keep each table row on one page. A row taller than a page still breaks. */
+tr {
+  break-inside: avoid;
+}
+
+/* Repeat the header row on each page. This is the default for <thead>;
+   the rule is here for CSS resets that change it. */
+thead {
+  display: table-header-group;
+}
+
+/* Print the totals in <tfoot> once, after the last row. */
+tfoot {
+  display: table-row-group;
+}
+
+/* Keep a heading on the same page as the block after it. */
+h1, h2, h3, h4 {
+  break-after: avoid;
+}
+
+/* Keep small blocks in one piece. */
+figure, pre, blockquote, .keep-together {
+  break-inside: avoid;
+}
+
+/* At least 3 lines of a paragraph at the end and at the start of a page. */
+p, li {
+  orphans: 3;
+  widows: 3;
+}
+
+/* Start a chapter on a new page: <section class="chapter">. */
+.chapter {
+  break-before: page;
+}

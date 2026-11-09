@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Forced break inside a grid layout</title>
+  <style>
+    /* The same base in every test document: A5 pages and 20px lines,
+       so that each engine puts the page break at the same place. */
+    @page { size: A5; margin: 15mm; }
+    html { font: 14px/20px "Liberation Sans", Arial, sans-serif; color: #1f2933; }
+    body { margin: 0; }
+    h2 { font-size: 18px; line-height: 24px; margin: 0 0 8px; }
+    p { margin: 0 0 10px; }
+    .spacer { background: #e4e7eb; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 4px 6px; border: 1px solid #9aa5b1; text-align: left; vertical-align: top; }
+    .layout { display: grid; grid-template-columns: 90px 1fr; gap: 12px; }
+  </style>
+</head>
+<body>
+  <!-- A sidebar layout with grid. The forced break is inside the main column. -->
+  <div class="layout">
+    <aside class="sidebar">SIDEBAR</aside>
+    <main>
+      <section class="intro">
+        <h2>INTRO1 Summary</h2>
+        <p>The first section is short.</p>
+      </section>
+      <section class="chapter">
+        <h2>CHAPTER2 Details</h2>
+        <p>Without a forced break, this section is on page 1.</p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

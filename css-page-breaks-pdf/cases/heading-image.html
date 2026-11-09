@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Heading before an image</title>
+  <style>
+    /* The same base in every test document: A5 pages and 20px lines,
+       so that each engine puts the page break at the same place. */
+    @page { size: A5; margin: 15mm; }
+    html { font: 14px/20px "Liberation Sans", Arial, sans-serif; color: #1f2933; }
+    body { margin: 0; }
+    h2 { font-size: 18px; line-height: 24px; margin: 0 0 8px; }
+    p { margin: 0 0 10px; }
+    .spacer { background: #e4e7eb; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 4px 6px; border: 1px solid #9aa5b1; text-align: left; vertical-align: top; }
+    .chart { display: block; width: 300px; height: 200px; }
+  </style>
+</head>
+<body>
+  <!-- The heading fits at the end of page 1, the 200px image does not. -->
+  <div class="spacer" style="height: 480px"></div>
+  <h2>HEADING Results</h2>
+  <img class="chart" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Crect width='10' height='10' fill='%2399ccff'/%3E%3C/svg%3E">
+  <p>CAPTION1 The chart.</p>
+</body>
+</html>

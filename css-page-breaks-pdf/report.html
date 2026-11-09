@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Incident report, October</title>
+  <style>
+    @page { size: A5; margin: 12mm; }
+    html { font: 12px/17px "Liberation Sans", Arial, sans-serif; color: #1f2933; }
+    body { margin: 0; }
+    h1 { font-size: 20px; line-height: 26px; margin: 0 0 6px; }
+    h2 { font-size: 15px; line-height: 20px; margin: 16px 0 6px; color: #0b4f6c; }
+    p { margin: 0 0 8px; }
+    .meta { color: #52606d; }
+    table { width: 100%; border-collapse: collapse; margin: 8px 0 12px; }
+    th, td { padding: 4px 6px; border: 1px solid #9aa5b1; text-align: left; vertical-align: top; }
+    th { background: #d9e2ec; }
+    tbody tr:nth-child(even) td { background: #f0f4f8; }
+    tfoot td { background: #fff3c4; font-weight: bold; }
+    td.id { white-space: nowrap; width: 54px; }
+    td.min { text-align: right; width: 44px; }
+    ul { margin: 0 0 8px; padding-left: 18px; }
+  </style>
+</head>
+<body>
+  <h1>Incident report, October</h1>
+  <p class="meta">Platform team. Prepared for the monthly service review on 4 November.</p>
+  <p class="meta">Period: 1 to 31 October. Times are in UTC.</p>
+  <p>Six incidents affected customers in October. Four came from changes that we deployed.
+    Two came from a provider. The table gives the start, the cause and the fix of each incident.</p>
+
+  <h2>Summary</h2>
+  <ul>
+    <li>6 incidents, 218 minutes of downtime in total.</li>
+    <li>4 incidents came from our own changes.</li>
+    <li>The longest incident stopped checkout for 63 minutes.</li>
+    <li>No data was lost.</li>
+  </ul>
+
+  <h2>Incidents</h2>
+  <table>
+    <thead>
+      <tr><th>ID</th><th>What happened</th><th>Minutes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="id">INC-101</td><td>The login page returned errors for users in one region. A new load balancer rule sent
+        their requests to a server pool that was not ready. We removed the rule and added a health check to the
+        deploy script. Closed 3 October.</td><td class="min">42</td></tr>
+      <tr><td class="id">INC-102</td><td>PDF invoices were empty for 40 minutes. The renderer started before the fonts were
+        installed in the new image, so every page had no text. We pinned the image, added a font check to the
+        start script and sent the affected invoices again. Closed 7 October.</td><td class="min">40</td></tr>
+      <tr><td class="id">INC-103</td><td>The DNS provider had an outage. Requests to the API failed for clients that do not
+        retry. We added a second DNS provider and asked the two largest clients to turn on retries.
+        Closed 9 October.</td><td class="min">25</td></tr>
+      <tr><td class="id">INC-104</td><td>A database migration locked the orders table. Checkout waited for the lock and timed
+        out. The migration ran in the day, not in the maintenance window, because a scheduled job used the wrong
+        time zone. We moved the job to UTC, split the migration into small batches and added an alert for long
+        locks. Customers who could not pay received an email with a link to finish the order. The finance team
+        compared the orders with the payments on the next day. Closed 12 October.</td><td class="min">63</td></tr>
+      <tr><td class="id">INC-105</td><td>The email provider delayed password reset messages by up to 30 minutes. We showed a
+        notice on the reset page until the queue was empty. Closed 18 October.</td><td class="min">30</td></tr>
+      <tr><td class="id">INC-106</td><td>A disk on the search server became full because log rotation stopped after an upgrade.
+        Search returned errors until we deleted the old logs. We added a disk usage alert at 80 percent.
+        Closed 24 October.</td><td class="min">18</td></tr>
+    </tbody>
+    <tfoot>
+      <tr><td></td><td>Total downtime</td><td class="min">218</td></tr>
+    </tfoot>
+  </table>
+
+  <h2>Causes</h2>
+  <p>Two of the six incidents came from scheduled jobs that ran at the wrong time. Both jobs used the local time
+    of the server, and one server changed its time zone during the upgrade in September.</p>
+  <p>One incident came from a missing font in a new image. The image build did not check the fonts, and the
+    tests used a page without text.</p>
+  <p>The other three incidents had different causes: a load balancer rule, a DNS outage and a full disk.</p>
+
+  <h2>Customer impact</h2>
+  <p>The total downtime was 218 minutes. In September it was 95 minutes. Checkout was not available for 63 minutes,
+    and 41 customers could not pay. All of them received an email with a link to finish the order.</p>
+  <p>All incidents have a written review. The reviews are in the team wiki.</p>
+  <p>The service review on 4 November discussed each incident with the team leads. The meeting agreed on four
+    actions. Each action has an owner and a date in the team plan. The next report shows the status of each
+    action and the incidents of November. Send questions about this report to the platform team.</p>
+  <p>The plan is in the shared drive. The team leads review it every Monday. Each owner reports progress in the
+    weekly call. The plan also lists the incidents that need a second review with the provider.</p>
+
+  <h2>Next steps</h2>
+  <ul>
+    <li>Move the backup job and all other scheduled jobs to UTC.</li>
+    <li>Run database migrations only in the maintenance window.</li>
+    <li>Add a font check to the image build for the PDF renderer.</li>
+    <li>Test the second DNS provider once a month.</li>
+  </ul>
+</body>
+</html>

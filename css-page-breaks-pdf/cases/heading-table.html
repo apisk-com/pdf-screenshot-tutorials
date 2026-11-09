@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Heading before a table</title>
+  <style>
+    /* The same base in every test document: A5 pages and 20px lines,
+       so that each engine puts the page break at the same place. */
+    @page { size: A5; margin: 15mm; }
+    html { font: 14px/20px "Liberation Sans", Arial, sans-serif; color: #1f2933; }
+    body { margin: 0; }
+    h2 { font-size: 18px; line-height: 24px; margin: 0 0 8px; }
+    p { margin: 0 0 10px; }
+    .spacer { background: #e4e7eb; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 4px 6px; border: 1px solid #9aa5b1; text-align: left; vertical-align: top; }
+  </style>
+</head>
+<body>
+  <!-- The heading fits at the end of page 1, the table does not. -->
+  <div class="spacer" style="height: 640px"></div>
+  <h2>HEADING Results</h2>
+  <table>
+    <tbody>
+      <tr><td>R01TOP<br>text<br>R01END</td><td>01</td></tr>
+      <tr><td>R02TOP<br>text<br>R02END</td><td>02</td></tr>
+      <tr><td>R03TOP<br>text<br>R03END</td><td>03</td></tr>
+    </tbody>
+  </table>
+</body>
+</html>
