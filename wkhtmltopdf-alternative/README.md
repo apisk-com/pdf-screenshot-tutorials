@@ -83,7 +83,12 @@ pytest
 ```
 
 `test.sh` installs the system packages with `sudo apt-get`, so run it only on a
-CI machine or a disposable Ubuntu 24.04 machine.
+CI machine or a disposable Ubuntu 24.04 machine. It installs the last upstream
+wkhtmltopdf build (0.12.6.1, patched Qt), runs the Node and Python tests,
+renders the invoice with the three engines and runs the visual diff. It also
+makes sure that wkhtmltopdf still shows the defaults that the tutorial
+describes: smart shrinking to 0.8, screen media, no flexbox or grid, no WOFF2
+fonts and no `@page` margin boxes.
 
 ## License
 
