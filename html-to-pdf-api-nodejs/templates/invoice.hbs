@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Invoice {{number}}</title>
+  <style>
+    body { margin: 0; font: 10.5pt/1.45 "Helvetica Neue", Arial, "Liberation Sans", sans-serif; color: #1f2937; }
+    header { display: flex; justify-content: space-between; padding-bottom: 14pt; border-bottom: 3pt solid #0f766e; }
+    h1 { margin: 0 0 4pt; font-size: 24pt; color: #0f766e; }
+    .muted { color: #6b7280; }
+    .seller { text-align: right; }
+    .customer { margin: 20pt 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th { padding: 7pt 8pt; text-align: left; background: #ccfbf1; }
+    td { padding: 7pt 8pt; border-bottom: 1pt solid #e5e7eb; }
+    tr { break-inside: avoid; }
+    .num { text-align: right; white-space: nowrap; }
+    .total td { font-weight: bold; border-top: 2pt solid #0f766e; border-bottom: 0; }
+    footer { margin-top: 28pt; font-size: 9pt; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Invoice</h1>
+      <div class="muted">No. {{number}} · Issued {{issued}} · Due {{due}}</div>
+    </div>
+    <div class="seller">
+      <strong>{{seller.name}}</strong><br>
+      {{#each seller.address}}{{this}}<br>{{/each}}
+    </div>
+  </header>
+
+  <section class="customer">
+    <div class="muted">Bill to</div>
+    <strong>{{customer.name}}</strong><br>
+    {{#each customer.address}}{{this}}<br>{{/each}}
+  </section>
+
+  <table>
+    <thead>
+      <tr><th>Description</th><th class="num">Qty</th><th class="num">Unit price</th><th class="num">Amount</th></tr>
+    </thead>
+    <tbody>
+      {{#each items}}
+      <tr><td>{{description}}</td><td class="num">{{quantity}}</td><td class="num">{{unitPrice}}</td><td class="num">{{amount}}</td></tr>
+      {{/each}}
+      <tr class="total"><td colspan="3">Total due</td><td class="num">{{total}}</td></tr>
+    </tbody>
+  </table>
+
+  <footer class="muted">{{note}}</footer>
+</body>
+</html>

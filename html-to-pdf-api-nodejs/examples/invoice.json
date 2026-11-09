@@ -1,0 +1,28 @@
+{
+  "template": "invoice",
+  "data": {
+    "number": "2026-0147",
+    "issued": "9 November 2026",
+    "due": "23 November 2026",
+    "seller": {
+      "name": "Example Studio Ltd",
+      "address": ["12 Harbour Street", "Bristol BS1 4XE", "United Kingdom"]
+    },
+    "customer": {
+      "name": "Acme Robotics & Co.",
+      "address": ["400 Market Street", "Portland, OR 97204", "United States"]
+    },
+    "items": [
+      { "description": "Discovery workshop", "quantity": 1, "unitPrice": "$1,200.00", "amount": "$1,200.00" },
+      { "description": "UI design, 12 screens", "quantity": 12, "unitPrice": "$150.00", "amount": "$1,800.00" },
+      { "description": "Front-end development (hours)", "quantity": 24, "unitPrice": "$95.00", "amount": "$2,280.00" },
+      { "description": "Hosting setup and handover", "quantity": 1, "unitPrice": "$350.00", "amount": "$350.00" }
+    ],
+    "total": "$5,630.00",
+    "note": "Pay by bank transfer within 14 days. Quote the invoice number."
+  },
+  "options": {
+    "format": "A4",
+    "margin": { "top": "18mm", "bottom": "18mm" }
+  }
+}
