@@ -1,0 +1,24 @@
+{
+  "name": "markdown-to-pdf-api",
+  "version": "1.0.0",
+  "description": "A small Markdown to PDF API with Express 5, markdown-it, highlight.js and Puppeteer.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "5.3.0",
+    "highlight.js": "11.12.0",
+    "markdown-it": "15.0.3",
+    "puppeteer": "25.16.0"
+  },
+  "devDependencies": {
+    "pdf-lib": "1.17.1"
+  }
+}
