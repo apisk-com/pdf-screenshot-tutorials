@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Invoice {{ invoice.number }}</title>
+  <meta name="author" content="{{ invoice.seller.name }}">
+  <link rel="stylesheet" href="invoice.css">
+</head>
+<body>
+  <header>
+    <img class="logo" src="logo.svg" alt="">
+    <address>
+      <strong>{{ invoice.seller.name }}</strong>
+      {% for line in invoice.seller.address %}<br>{{ line }}{% endfor %}
+    </address>
+  </header>
+
+  <h1>Invoice <span class="number">{{ invoice.number }}</span></h1>
+
+  <section class="parties">
+    <address>
+      <span class="label">Bill to</span>
+      <strong>{{ invoice.customer.name }}</strong>
+      {% for line in invoice.customer.address %}<br>{{ line }}{% endfor %}
+    </address>
+    <dl>
+      <dt>Issued</dt><dd>{{ invoice.issued }}</dd>
+      <dt>Due</dt><dd>{{ invoice.due }}</dd>
+    </dl>
+  </section>
+
+  <table class="items">
+    <thead>
+      <tr><th>#</th><th>Description</th><th class="num">Qty</th><th class="num">Unit price</th><th class="num">Amount</th></tr>
+    </thead>
+    <tbody>
+      {% for item in invoice.items %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ item.description }}</td>
+        <td class="num">{{ item.quantity }}</td>
+        <td class="num">{{ item.unit_price | money(invoice.currency) }}</td>
+        <td class="num">{{ (item.quantity * item.unit_price) | money(invoice.currency) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p class="total">Total due <strong>{{ total | money(invoice.currency) }}</strong></p>
+  {% if invoice.note %}<p class="note">{{ invoice.note }}</p>{% endif %}
+</body>
+</html>
