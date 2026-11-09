@@ -1,0 +1,23 @@
+{
+  "name": "screenshot-api-nodejs",
+  "version": "1.0.0",
+  "description": "Website screenshot API with Node.js, Express and Playwright",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test test/*.test.js",
+    "test-page": "node test/test-page-server.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.1164.0",
+    "express": "5.3.0",
+    "playwright": "1.65.0"
+  },
+  "devDependencies": {
+    "image-size": "2.1.0"
+  }
+}

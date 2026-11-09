@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Screenshot test page</title>
+  <style>
+    body { margin: 0; font: 18px/1.5 system-ui, sans-serif; color: #0f172a; background: #f8fafc; }
+    main { max-width: 1040px; margin: 0 auto; padding: 48px 24px; }
+    h1 { margin: 0 0 8px; font-size: 40px; line-height: 1.15; }
+    .seen { margin: 0 0 32px; color: #334155; }
+    .seen b { color: #1d4ed8; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .card { padding: 24px; border-radius: 12px; color: #fff; }
+    .card h2 { margin: 0 0 6px; font-size: 24px; }
+    .card p { margin: 0; font-size: 15px; }
+    .png { background: #2563eb; }
+    .jpeg { background: #0f766e; }
+    .webp { background: #7c3aed; }
+    .lines { height: 64px; margin-top: 32px; border-radius: 12px;
+      background: repeating-linear-gradient(90deg, #0f172a 0 1px, #f8fafc 1px 4px); }
+    @media (max-width: 640px) {
+      h1 { font-size: 30px; }
+      .cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Screenshot test page</h1>
+    <p class="seen">
+      This page sees a viewport of <b id="size"></b> CSS pixels
+      and a device pixel ratio of <b id="ratio"></b>.
+    </p>
+    <div class="cards">
+      <div class="card png"><h2>PNG</h2><p>Lossless. Sharp text and flat colors.</p></div>
+      <div class="card jpeg"><h2>JPEG</h2><p>Lossy. Small files for photos.</p></div>
+      <div class="card webp"><h2>WebP</h2><p>Lossy or lossless. Small files.</p></div>
+    </div>
+    <div class="lines" title="1 px lines show the effect of the scale parameter"></div>
+  </main>
+  <script>
+    document.getElementById('size').textContent = `${innerWidth} x ${innerHeight}`;
+    document.getElementById('ratio').textContent = String(devicePixelRatio);
+  </script>
+</body>
+</html>
