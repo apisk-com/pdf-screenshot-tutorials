@@ -31,6 +31,7 @@ echo "== Render the invoice with the three engines"
 rm -rf out && mkdir -p out
 ./render-wkhtmltopdf.sh document/invoice.html out/wkhtmltopdf.pdf
 node render-chrome.mjs document/invoice.html out/chrome.pdf
+node render-chrome.mjs document/invoice.html out/chrome-0.8.pdf 0.8
 python render_weasyprint.py document/invoice.html out/weasyprint.pdf
 for f in out/*.pdf; do
   head -c 5 "$f" | grep -q '%PDF-' || { echo "Not a PDF: $f"; exit 1; }
@@ -42,6 +43,7 @@ echo "== Visual diff: old (wkhtmltopdf) and new PDFs"
 # A migration diff is not 0%, so print the result and do not fail here.
 # The exit codes of diff-pdfs.mjs are tested in test/diff.test.mjs.
 node diff-pdfs.mjs out/wkhtmltopdf.pdf out/chrome.pdf out/diff-chrome || true
+node diff-pdfs.mjs out/wkhtmltopdf.pdf out/chrome-0.8.pdf out/diff-chrome-0.8 || true
 node diff-pdfs.mjs out/wkhtmltopdf.pdf out/weasyprint.pdf out/diff-weasyprint || true
 node diff-pdfs.mjs out/chrome.pdf out/weasyprint.pdf out/diff-chrome-weasyprint || true
 
@@ -71,12 +73,25 @@ echo "default margins: TOPLEFT x=$(word out/wk-default.pdf TOPLEFT xMin) y=$(wor
 wkhtmltopdf -q test/fixtures/outside-font.html out/wk-outside-font.pdf || echo "outside-font.html: wkhtmltopdf failed"
 echo "outside-font.html fonts (local file access off by default): $(pdffonts out/wk-outside-font.pdf | tail -n +3 | awk '{print $1}' | tr '\n' ' ')"
 
+wkhtmltopdf -q --enable-local-file-access test/fixtures/outside-font.html out/wk-woff2.pdf
+echo "WOFF2 only, local file access on: $(pdffonts out/wk-woff2.pdf | tail -n +3 | awk '{print $1}' | tr '\n' ' ')"
+
+wkhtmltopdf -q test/fixtures/delayed.html out/wk-nodelay.pdf
+echo "delayed.html with the default delay (200 ms): $(pdftotext out/wk-nodelay.pdf - | grep -oE 'LOADING|CHARTREADY')"
 wkhtmltopdf -q --javascript-delay 2000 test/fixtures/delayed.html out/wk-delayed.pdf
 echo "delayed.html with --javascript-delay 2000: $(pdftotext out/wk-delayed.pdf - | grep -oE 'LOADING|CHARTREADY')"
 
+echo "== The Ubuntu package (unpatched Qt) and footer flags"
+# Last step, because apt can replace the upstream package.
+sudo apt-get install -y -qq wkhtmltopdf > /dev/null 2>&1 || echo "apt could not install the Ubuntu package"
+QT_QPA_PLATFORM=offscreen /usr/bin/wkhtmltopdf --version || true
+QT_QPA_PLATFORM=offscreen /usr/bin/wkhtmltopdf --footer-center "Page [page] of [topage]" \
+  test/fixtures/long.html out/ubuntu-footer.pdf 2>&1 | grep -v -E '^\[|Loading|Counting|Resolving|Printing|Done' || true
+echo "footer text in the PDF: $(pdftotext out/ubuntu-footer.pdf - 2>/dev/null | grep -c 'Page 1 of') line(s)"
+
 # Temporary: print the comparison images, so that they can be used in the article.
 if [ "${GITHUB_ACTIONS:-}" = true ]; then
-  for f in out/diff-chrome/page-1.png out/diff-weasyprint/page-1.png out/diff-chrome-weasyprint/page-1.png; do
+  for f in out/diff-chrome-0.8/page-1.png out/diff-chrome-0.8/page-2.png out/diff-weasyprint/page-2.png out/diff-chrome-weasyprint/page-1.png; do
     echo "::group::base64 $f"
     echo "BEGIN-BASE64 $f"
     base64 -w0 "$f"

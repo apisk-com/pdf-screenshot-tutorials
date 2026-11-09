@@ -1,5 +1,5 @@
 // Render an HTML file to PDF with headless Chrome (Puppeteer).
-// Usage: node render-chrome.mjs document/invoice.html out/chrome.pdf
+// Usage: node render-chrome.mjs document/invoice.html out/chrome.pdf [scale]
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -38,16 +38,17 @@ export async function renderPdf(browser, inputPath, options = {}) {
   }
 }
 
-// Command line: node render-chrome.mjs <input.html> <output.pdf>
+// Command line: node render-chrome.mjs <input.html> <output.pdf> [scale]
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const [input, output] = process.argv.slice(2);
+  const [input, output, scale = '1'] = process.argv.slice(2);
   if (!input || !output) {
-    console.error('Usage: node render-chrome.mjs <input.html> <output.pdf>');
+    console.error('Usage: node render-chrome.mjs <input.html> <output.pdf> [scale]');
     process.exit(2);
   }
   const browser = await puppeteer.launch();
   try {
-    const pdf = await renderPdf(browser, input);
+    // scale 0.8 gives the size of the old wkhtmltopdf output (smart shrinking).
+    const pdf = await renderPdf(browser, input, { pdf: { scale: Number(scale) } });
     await mkdir(dirname(resolve(output)), { recursive: true });
     await writeFile(output, pdf);
     console.log(`Wrote ${output} (${pdf.length} bytes)`);
