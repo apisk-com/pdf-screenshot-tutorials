@@ -14,14 +14,6 @@ docker build -t "$image" .
 docker image ls "$image"
 echo "Node.js in the image: $(docker run --rm "$image" node --version)"
 
-# Temporary check: what happens without SYS_ADMIN?
-docker run --rm "$image" node -e "
-  import('playwright')
-    .then(({ chromium }) => chromium.launch({ chromiumSandbox: true }))
-    .then((b) => { console.log('SANDBOX CHECK: started'); return b.close(); })
-    .catch((e) => console.log('SANDBOX CHECK: failed:', e.message.split('\n').slice(0, 14).join(' | ')));
-" || true
-
 # A local test page. The container uses the host network, so it can open it.
 PORT=8080 node test/test-page-server.js &
 pages_pid=$!
