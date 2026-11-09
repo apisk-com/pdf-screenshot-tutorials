@@ -1,23 +1,15 @@
-# HTML to PDF and screenshot tutorials
+# Moved: one repository per task
 
-Working code for the [APISK developer tutorials](https://apisk.com/blog/). The
-tutorials show how to build your own HTML to PDF, screenshot and rendering
-services with headless Chrome, Puppeteer, Playwright, WeasyPrint and other
-open-source tools.
+The code of the [APISK tutorials](https://apisk.com/blog/) is now in one
+repository per task. Each repository has one folder per language and tool, so
+examples for other languages and frameworks can be added next to the existing
+ones.
 
-Each folder holds the complete code for one tutorial. Each folder runs on its
-own: open its `README.md` for the commands.
+| Repository | What it has |
+|---|---|
+| [html-to-pdf](https://github.com/apisk-com/html-to-pdf) | HTML and URL to PDF with Puppeteer, Playwright and WeasyPrint; page breaks, headers and footers, wkhtmltopdf migration |
+| [markdown-to-pdf](https://github.com/apisk-com/markdown-to-pdf) | Markdown to PDF |
+| [website-screenshot](https://github.com/apisk-com/website-screenshot) | Website screenshot APIs and full-page screenshots |
+| [headless-chrome-production](https://github.com/apisk-com/headless-chrome-production) | Docker images and other production topics for headless Chrome |
 
-## Tutorials
-
-The list grows as the tutorials are published.
-
-## Tests
-
-Each folder has a `test.sh` file. The GitHub Actions workflow in
-`.github/workflows/test.yml` runs it on Ubuntu for every folder that a push
-changes.
-
-## License
-
-MIT. See [LICENSE](LICENSE).
+This repository is archived and gets no more changes.
