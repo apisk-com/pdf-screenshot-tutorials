@@ -47,58 +47,52 @@ node diff-pdfs.mjs out/wkhtmltopdf.pdf out/chrome-0.8.pdf out/diff-chrome-0.8 ||
 node diff-pdfs.mjs out/wkhtmltopdf.pdf out/weasyprint.pdf out/diff-weasyprint || true
 node diff-pdfs.mjs out/chrome.pdf out/weasyprint.pdf out/diff-chrome-weasyprint || true
 
-echo "== Measurements of wkhtmltopdf behavior"
-# x/y position of a word on page 1, from pdftotext -bbox.
+echo "== wkhtmltopdf behavior that the tutorial describes"
+# x or y position (in points) of a word on page 1, from pdftotext -bbox.
 word() { pdftotext -bbox -f 1 -l 1 "$1" - | grep -m1 ">$2<" | sed -E "s/.*$3=\"([0-9.]+)\".*/\1/" || true; }
+# expect <description> <actual> <expected>: stop with an error when they differ.
+expect() {
+  if [ "$2" = "$3" ]; then echo "ok: $1 ($2)"; else echo "FAILED: $1: got '$2', expected '$3'"; exit 1; fi
+}
+ruler() { echo "$(word "$1" RIGHTMARK xMax) - $(word "$1" LEFTMARK xMin)" | bc | xargs printf '%.0f'; }
 
 wkhtmltopdf -q -T 0 -B 0 -L 0 -R 0 test/fixtures/plain.html out/wk-shrink.pdf
 wkhtmltopdf -q -T 0 -B 0 -L 0 -R 0 --disable-smart-shrinking test/fixtures/plain.html out/wk-noshrink.pdf
-for f in out/wk-shrink.pdf out/wk-noshrink.pdf; do
-  width=$(echo "$(word "$f" RIGHTMARK xMax) - $(word "$f" LEFTMARK xMin)" | bc)
-  echo "$f: 400px ruler is $width pt wide (Chrome at scale 1: 300 pt)"
-done
+expect "smart shrinking: a 400px box in pt" "$(ruler out/wk-shrink.pdf)" 240
+expect "--disable-smart-shrinking: a 400px box in pt" "$(ruler out/wk-noshrink.pdf)" 300
 
 wkhtmltopdf -q test/fixtures/modern-css.html out/wk-modern.pdf
-echo "flex: FLEXA y=$(word out/wk-modern.pdf FLEXA yMin), FLEXC y=$(word out/wk-modern.pdf FLEXC yMin)"
-echo "grid: GRIDA y=$(word out/wk-modern.pdf GRIDA yMin), GRIDC y=$(word out/wk-modern.pdf GRIDC yMin)"
+expect "flex items on one line" "$([ "$(word out/wk-modern.pdf FLEXA yMin)" = "$(word out/wk-modern.pdf FLEXC yMin)" ] && echo yes || echo no)" no
+expect "grid items on one line" "$([ "$(word out/wk-modern.pdf GRIDA yMin)" = "$(word out/wk-modern.pdf GRIDC yMin)" ] && echo yes || echo no)" no
 
 wkhtmltopdf -q -L 10mm test/fixtures/css-margin.html out/wk-css-margin.pdf
-echo "css-margin.html with -L 10mm: TOPLEFT x=$(word out/wk-css-margin.pdf TOPLEFT xMin) pt (10mm = 28.3 pt, 30mm = 85 pt)"
+expect "CSS @page margin 30mm and -L 10mm: left edge under 40 pt" "$(echo "$(word out/wk-css-margin.pdf TOPLEFT xMin) < 40" | bc)" 1
 
 wkhtmltopdf -q test/fixtures/plain.html out/wk-default.pdf
-echo "default media type: $(pdftotext out/wk-default.pdf - | grep -oE 'SCREENTEXT|PRINTTEXT' | tr '\n' ' ')"
-echo "default page: $(pdfinfo out/wk-default.pdf | grep 'Page size')"
-echo "default margins: TOPLEFT x=$(word out/wk-default.pdf TOPLEFT xMin) y=$(word out/wk-default.pdf TOPLEFT yMin)"
-
-wkhtmltopdf -q test/fixtures/outside-font.html out/wk-outside-font.pdf || echo "outside-font.html: wkhtmltopdf failed"
-echo "outside-font.html fonts (local file access off by default): $(pdffonts out/wk-outside-font.pdf | tail -n +3 | awk '{print $1}' | tr '\n' ' ')"
+expect "default media type" "$(pdftotext out/wk-default.pdf - | grep -oE 'SCREENTEXT|PRINTTEXT')" SCREENTEXT
 
 wkhtmltopdf -q --enable-local-file-access test/fixtures/outside-font.html out/wk-woff2.pdf
-echo "WOFF2 only, local file access on: $(pdffonts out/wk-woff2.pdf | tail -n +3 | awk '{print $1}' | tr '\n' ' ')"
+expect "a WOFF2-only web font is used" "$(pdffonts out/wk-woff2.pdf | grep -c Inter || true)" 0
+expect "the WOFF fallback of the invoice is used" "$(pdffonts out/wkhtmltopdf.pdf | grep -c Inter-Regular)" 1
 
 wkhtmltopdf -q test/fixtures/delayed.html out/wk-nodelay.pdf
-echo "delayed.html with the default delay (200 ms): $(pdftotext out/wk-nodelay.pdf - | grep -oE 'LOADING|CHARTREADY')"
 wkhtmltopdf -q --javascript-delay 2000 test/fixtures/delayed.html out/wk-delayed.pdf
-echo "delayed.html with --javascript-delay 2000: $(pdftotext out/wk-delayed.pdf - | grep -oE 'LOADING|CHARTREADY')"
+expect "default JavaScript delay (200 ms)" "$(pdftotext out/wk-nodelay.pdf - | grep -oE 'LOADING|CHARTREADY')" LOADING
+expect "--javascript-delay 2000" "$(pdftotext out/wk-delayed.pdf - | grep -oE 'LOADING|CHARTREADY')" CHARTREADY
 
-echo "== The Ubuntu package (unpatched Qt) and footer flags"
-# Last step, because apt can replace the upstream package.
-sudo apt-get install -y -qq wkhtmltopdf > /dev/null 2>&1 || echo "apt could not install the Ubuntu package"
-QT_QPA_PLATFORM=offscreen /usr/bin/wkhtmltopdf --version || true
-QT_QPA_PLATFORM=offscreen /usr/bin/wkhtmltopdf --footer-center "Page [page] of [topage]" \
-  test/fixtures/long.html out/ubuntu-footer.pdf 2>&1 | grep -v -E '^\[|Loading|Counting|Resolving|Printing|Done' || true
-echo "footer text in the PDF: $(pdftotext out/ubuntu-footer.pdf - 2>/dev/null | grep -c 'Page 1 of') line(s)"
-
-# Temporary: print the comparison images, so that they can be used in the article.
-if [ "${GITHUB_ACTIONS:-}" = true ]; then
-  for f in out/diff-chrome-0.8/page-1.png out/diff-chrome-0.8/page-2.png out/diff-weasyprint/page-2.png out/diff-chrome-weasyprint/page-1.png; do
-    echo "::group::base64 $f"
-    echo "BEGIN-BASE64 $f"
-    base64 -w0 "$f"
-    echo
-    echo "END-BASE64 $f"
-    echo "::endgroup::"
-  done
+echo "== The Ubuntu package of wkhtmltopdf (unpatched Qt) and the footer flags"
+# Information only. Last step, because apt can replace the upstream package.
+if sudo apt-get install -y -qq wkhtmltopdf > /dev/null 2>&1; then
+  export QT_QPA_PLATFORM=offscreen
+  /usr/bin/wkhtmltopdf --version || true
+  /usr/bin/wkhtmltopdf --log-level warn --footer-center "Page [page] of [topage]" \
+    test/fixtures/long.html out/ubuntu-footer.pdf 2>&1 | tr '\r' '\n' | grep -v '^\s*$' || true
+  if [ -f out/ubuntu-footer.pdf ]; then
+    echo "body text lines: $(pdftotext out/ubuntu-footer.pdf - | grep -c 'Block 1' || true)"
+    echo "footer text lines: $(pdftotext out/ubuntu-footer.pdf - | grep -c 'Page 1 of' || true)"
+  fi
+else
+  echo "apt could not install the Ubuntu package"
 fi
 
 echo "== All checks passed"
