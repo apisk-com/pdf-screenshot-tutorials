@@ -1,0 +1,20 @@
+{
+  "name": "playwright-pdf-node",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Generate PDFs from HTML with Playwright in Node.js",
+  "scripts": {
+    "pdf": "node make-pdf.js ../report.html out/report.pdf",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "playwright": "1.65.0"
+  },
+  "devDependencies": {
+    "pdf-lib": "1.17.1"
+  }
+}
