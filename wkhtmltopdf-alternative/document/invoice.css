@@ -1,0 +1,60 @@
+/* Layout of the sample invoice. It uses only CSS that the old
+   Qt WebKit engine of wkhtmltopdf understands (tables and floats),
+   so the old and the new PDF can be compared. */
+@font-face {
+  font-family: "Inter";
+  font-weight: 400;
+  src: url("fonts/inter-latin-400-normal.woff2") format("woff2"),
+       url("fonts/inter-latin-400-normal.woff") format("woff");
+}
+@font-face {
+  font-family: "Inter";
+  font-weight: 700;
+  src: url("fonts/inter-latin-700-normal.woff2") format("woff2"),
+       url("fonts/inter-latin-700-normal.woff") format("woff");
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  font-size: 10pt;
+  line-height: 1.4;
+  color: #1d2329;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+h1 { font-size: 16pt; margin: 0 0 4pt; }
+h2 { font-size: 12pt; margin: 18pt 0 6pt; }
+p { margin: 0 0 6pt; }
+
+.brand-bar { background: #0f6e56; color: #ffffff; padding: 10pt 12pt; overflow: hidden; }
+.brand { font-weight: 700; font-size: 13pt; }
+.doc-type { float: right; letter-spacing: 2pt; padding-top: 2pt; }
+
+.columns { display: table; width: 100%; margin-top: 14pt; }
+.column { display: table-cell; width: 50%; vertical-align: top; }
+.bill-to { padding-left: 20pt; }
+.label { display: block; font-size: 8pt; color: #5b6470; text-transform: uppercase; }
+
+.summary { width: 100%; border-collapse: collapse; margin-top: 10pt; }
+.summary td { width: 33%; padding: 8pt; background: #eef3f1; border: 2pt solid #ffffff; }
+.summary .due { background: #0f6e56; color: #ffffff; font-weight: 700; }
+.summary .due .label { color: #d9efe8; }
+
+.items { width: 100%; border-collapse: collapse; }
+.items th { text-align: left; font-size: 8pt; color: #5b6470; border-bottom: 1pt solid #1d2329; padding: 4pt; }
+.items td { padding: 4pt; border-bottom: 0.5pt solid #d5dadf; }
+.items tr { page-break-inside: avoid; }
+.num { text-align: right; }
+
+.totals { width: 45%; margin: 10pt 0 0 55%; border-collapse: collapse; }
+.totals td { padding: 4pt; }
+.totals .total td { font-weight: 700; border-top: 1pt solid #1d2329; }
+.note { font-size: 8pt; color: #5b6470; }
+
+.pay-button { display: inline-block; margin-top: 10pt; padding: 6pt 12pt; background: #1d2329; color: #ffffff; text-decoration: none; }
+
+/* The online button is for the screen only. */
+@media print {
+  .no-print { display: none; }
+}

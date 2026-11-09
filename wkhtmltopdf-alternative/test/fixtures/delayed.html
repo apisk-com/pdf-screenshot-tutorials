@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><style>body { font-family: sans-serif; }</style></head>
+<body>
+  <p id="chart">LOADING</p>
+  <script>
+    // A chart library that draws late, then tells the renderer it is ready.
+    setTimeout(function () {
+      document.getElementById('chart').textContent = 'CHARTREADY';
+      window.status = 'ready';
+    }, 1500);
+  </script>
+</body>
+</html>

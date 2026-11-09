@@ -1,0 +1,21 @@
+/* Page rules for Chrome 131+ and WeasyPrint.
+   They replace the page flags of the old wkhtmltopdf command.
+   wkhtmltopdf ignores the margin boxes. */
+@page {
+  size: A4;                     /* --page-size A4 */
+  margin: 20mm 15mm;            /* -T 20mm -B 20mm -L 15mm -R 15mm */
+
+  @top-left {                   /* --header-html header.html */
+    content: "Lumen Data Ltd";
+    font-family: "Inter", sans-serif;
+    font-size: 8pt;
+    color: #5b6470;
+  }
+
+  @bottom-center {              /* --footer-center "Page [page] of [topage]" */
+    content: "Page " counter(page) " of " counter(pages);
+    font-family: "Inter", sans-serif;
+    font-size: 8pt;
+    color: #5b6470;
+  }
+}
