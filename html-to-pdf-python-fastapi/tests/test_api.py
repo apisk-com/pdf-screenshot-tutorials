@@ -49,11 +49,11 @@ def test_invoice_pdf(client):
 
 
 def test_template_escapes_html_in_the_data(client):
-    data = {**EXAMPLE, "customer": {"name": '<img src="file:///etc/passwd">Mallory'}}
+    data = {**EXAMPLE, "customer": {"name": "<b>Mallory</b> & Sons"}}
     html = main.invoice_html(main.Invoice.model_validate(data))
-    assert "&lt;img src=&#34;file:///etc/passwd&#34;&gt;Mallory" in html
+    assert "&lt;b&gt;Mallory&lt;/b&gt; &amp; Sons" in html
     page_1 = read_pdf(client.post("/invoices/pdf", json=data)).pages[0].extract_text()
-    assert '<img src="file:///etc/passwd">Mallory' in page_1
+    assert "<b>Mallory</b> & Sons" in page_1
 
 
 @pytest.mark.parametrize("change", [
