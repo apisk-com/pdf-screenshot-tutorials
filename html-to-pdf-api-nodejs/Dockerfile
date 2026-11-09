@@ -7,11 +7,12 @@ ENV PUPPETEER_CACHE_DIR=/app/.cache/puppeteer
 ENV PUPPETEER_CHROME_HEADLESS_SHELL_SKIP_DOWNLOAD=true
 
 COPY package.json package-lock.json ./
-# npm ci downloads Chrome. --install-deps adds the Linux libraries that Chrome needs.
+# Puppeteer needs unzip to unpack Chrome. npm ci downloads Chrome.
+# --install-deps then adds the Linux libraries that Chrome needs.
 RUN apt-get update \
+  && apt-get install -y --no-install-recommends unzip fonts-liberation fonts-noto-color-emoji \
   && npm ci --omit=dev \
   && npx puppeteer browsers install chrome --install-deps \
-  && apt-get install -y --no-install-recommends fonts-liberation fonts-noto-color-emoji \
   && rm -rf /var/lib/apt/lists/* /root/.npm
 
 COPY src ./src
