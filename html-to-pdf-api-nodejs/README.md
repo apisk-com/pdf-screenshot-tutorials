@@ -10,6 +10,7 @@ PDF back. The tutorial explains each file:
 
 - Node.js 22.12 or later (Puppeteer 25 needs it).
 - macOS, Linux or Windows. `npm ci` downloads Chrome for Puppeteer.
+- On Linux, the `unzip` command. Puppeteer uses it to unpack Chrome.
 - Docker, only if you want to run the container.
 
 ## Install, run and test
