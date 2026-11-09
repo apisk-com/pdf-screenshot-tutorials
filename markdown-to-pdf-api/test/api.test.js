@@ -4,7 +4,7 @@ import { createServer } from 'node:http';
 import { after, before, test } from 'node:test';
 import { PDFDocument } from 'pdf-lib';
 import { createApp } from '../src/app.js';
-import { markdownToHtml, unwrapMarkdownFence } from '../src/markdown.js';
+import { cleanMarkdown, markdownToHtml } from '../src/markdown.js';
 import { closeBrowser, renderPdf } from '../src/render.js';
 
 let api;
@@ -70,9 +70,10 @@ test('<br> breaks a line in a table cell, nowhere else', () => {
   assert.match(html, /Text &lt;br&gt; here/);
 });
 
-test('an outer ```markdown fence is removed, other fences stay', () => {
-  assert.equal(unwrapMarkdownFence('```markdown\n# Hi\n\nText\n```'), '# Hi\n\nText');
-  assert.equal(unwrapMarkdownFence('```js\nx = 1\n```'), '```js\nx = 1\n```');
+test('front matter and an outer ```markdown fence are removed', () => {
+  assert.equal(cleanMarkdown('---\ntitle: Notes\n---\n# Hi'), '# Hi');
+  assert.equal(cleanMarkdown('```markdown\n# Hi\n\nText\n```'), '# Hi\n\nText');
+  assert.equal(cleanMarkdown('```js\nx = 1\n```'), '```js\nx = 1\n```');
 });
 
 test('the render makes no network requests', async () => {

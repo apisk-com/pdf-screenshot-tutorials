@@ -50,12 +50,16 @@ md.core.ruler.push('table_cell_br', (state) => {
   }
 });
 
-// Chat models often put the full answer in a ```markdown fence.
-// Remove that outer fence, so the answer prints as a document, not as code.
-export function unwrapMarkdownFence(text) {
-  const clean = text.replace(/\r\n?/g, '\n').trim();
-  const match = clean.match(/^(`{3,}|~{3,})(?:markdown|md)[ \t]*\n([\s\S]*?)\n\1[ \t]*$/i);
-  return match ? match[2] : clean;
+// Clean the input before markdown-it reads it.
+export function cleanMarkdown(text) {
+  let clean = text.replace(/\r\n?/g, '\n').trim();
+  // Front matter (--- at the top) is metadata, not text. Remove it without
+  // parsing it: some front matter parsers can run JavaScript.
+  clean = clean.replace(/^---[a-z]*\n[\s\S]*?\n---(\n|$)/, '');
+  // Chat models often put the full answer in a ```markdown fence. Remove that
+  // outer fence, so the answer prints as a document, not as one code block.
+  const fenced = clean.match(/^(`{3,}|~{3,})(?:markdown|md)[ \t]*\n([\s\S]*?)\n\1[ \t]*$/i);
+  return fenced ? fenced[2] : clean;
 }
 
 function firstHeadingText(tokens) {
@@ -69,11 +73,11 @@ function firstHeadingText(tokens) {
 
 // Markdown in, a complete HTML document out. breakBefore: 'none', 'h1' or 'h2'.
 export function markdownToHtml(markdown, { breakBefore = 'none' } = {}) {
-  const tokens = md.parse(unwrapMarkdownFence(markdown), {});
+  const tokens = md.parse(cleanMarkdown(markdown), {});
   const title = firstHeadingText(tokens) || 'Document';
   const body = md.renderer
     .render(tokens, md.options, {})
-    // A paragraph with only \newpage starts a new page. Pandoc reads the same marker.
+    // A paragraph with only \newpage starts a new page, as in Pandoc with LaTeX.
     .replaceAll('<p>\\newpage</p>', '<div class="page-break"></div>');
 
   return `<!doctype html>

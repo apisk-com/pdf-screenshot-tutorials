@@ -3,7 +3,8 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-# A color emoji font. Without it, Chrome on Linux prints empty boxes for emoji.
+# Chrome needs a color emoji font to print emoji. The GitHub runner has one;
+# slim Docker images do not.
 sudo apt-get update
 sudo apt-get install -y --no-install-recommends fonts-noto-color-emoji
 
